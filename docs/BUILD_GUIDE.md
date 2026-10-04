@@ -136,6 +136,8 @@ cd /home/rmg/ui && sh build_ui_ksu325.sh      # 出 3.2.5 版
 
 ## 5. 更新版本号（替换内嵌 ksud）
 
+> ⚠️ **版本号的真正来源是内嵌 ko 的编译常量（`30000 + git提交数 − 7`），且“已加载则跳过”导致必须重启/重跑才生效。完整溯源与修正配方见 [`KSU_VERSION_FIX.md`](KSU_VERSION_FIX.md)。**
+
 **核心原则：换 KernelSU 版本 = 换 `assets/ksud` 一个文件。**
 
 ### 5.1 从 KernelSU 管理器 APK 取 ksud
