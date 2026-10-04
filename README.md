@@ -1,6 +1,8 @@
 # 聪来提权（conglai-tiquan）· S23 适配版
 
 > 📘 **构建 / 版本维护完整教程见 [`docs/BUILD_GUIDE.md`](docs/BUILD_GUIDE.md)**
+>
+> 🎯 **版本号（32525 / 32653…）的来源、修正配方与生效条件，只看 [`docs/KSU_VERSION_FIX.md`](docs/KSU_VERSION_FIX.md)**
 
 > 一款基于 **DFRoot / DFReroot**（DirtyFrag 漏洞利用链）的 Android 触发式提权应用，
 > 面向 **Samsung Galaxy S23 (SM-S9110)** 适配，通过 late-load 方式加载 **KernelSU v3.2.5 (32525)**。
