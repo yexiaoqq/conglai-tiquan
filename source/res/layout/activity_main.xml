@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--聪来提权 · MD3 重构：NavigationBar + 运行记录持久化 + 二级详情页-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="?attr/colorSurfaceContainer"
+            android:title="聪来提权"
+            app:subtitle="Samsung S23 · KernelSU late-load"
+            app:subtitleTextAppearance="@style/TextAppearance.Material3.LabelSmall" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- ======================= 首页 ======================= -->
+            <ScrollView
+                android:id="@+id/homePage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="20dp"
+                            android:paddingTop="16dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="16dp">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginEnd="16dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/cl_ic_shield"
+                                app:tint="?attr/colorPrimary" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txtRootState"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                    android:text="正在检测…" />
+
+                                <TextView
+                                    android:id="@+id/txtRootHint"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:text="/dev/df 内核守护标记" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardExploit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="20dp"
+                            android:paddingTop="16dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="12dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingBottom="4dp"
+                                android:text="提权漏洞利用（CVE-2026-43284）"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingBottom="12dp"
+                                android:text="加载内嵌 dirtyfrag.ko 并调起 ksud late-load，取得内核级 root。全程不触碰启动链。"
+                                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnRun"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="52dp"
+                                android:text="开始提权"
+                                app:cornerRadius="14dp" />
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switchManualSoftReboot"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="48dp"
+                                android:text="完成后自动软重启" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardBoot"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="20dp"
+                            android:paddingTop="16dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="8dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingBottom="4dp"
+                                android:text="开机自启"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switchBootStart"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="48dp"
+                                android:text="启用开机自动恢复" />
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switchAutoSoftReboot"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="48dp"
+                                android:paddingBottom="4dp"
+                                android:text="软重启后自动继续" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- ======================= 运行记录 ======================= -->
+            <LinearLayout
+                android:id="@+id/logPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="运行记录"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                    <TextView
+                        android:id="@+id/txtHistoryCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:text="0 条" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExportHistory"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="复制全部记录"
+                        app:icon="@drawable/cl_ic_copy" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearHistory"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="清空记录"
+                        app:icon="@drawable/cl_ic_delete" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ScrollView
+                        android:id="@+id/historyScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fillViewport="true">
+
+                        <LinearLayout
+                            android:id="@+id/historyList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="8dp" />
+                    </ScrollView>
+
+                    <LinearLayout
+                        android:id="@+id/historyEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp">
+
+                        <ImageView
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:alpha="0.6"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/cl_ic_history"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="暂无运行记录"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="点击首页「开始提权」，运行过程会保存在这里，重启也不会丢失。"
+                            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorSurfaceContainerLow"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/txtLiveLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="本次输出"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        <ProgressBar
+                            android:id="@+id/runProgress"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <ScrollView
+                        android:id="@+id/outputScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="110dp"
+                        android:layout_marginTop="6dp">
+
+                        <TextView
+                            android:id="@+id/outputView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="monospace"
+                            android:textIsSelectable="true"
+                            android:textSize="11sp" />
+                    </ScrollView>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ======================= 关于 ======================= -->
+            <ScrollView
+                android:id="@+id/aboutPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardCreator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="创作者"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/cl_ic_chevron"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardTheme"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="主题"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/cl_ic_chevron"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardPrinciple"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="操作原理"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/cl_ic_chevron"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardDevice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="适用机型 / 版本号"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/cl_ic_chevron"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSource"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="来源仓库"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                                android:textColor="?attr/colorPrimary" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/cl_ic_chevron"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- ======================= 详情页 ======================= -->
+            <FrameLayout
+                android:id="@+id/detailPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/colorSurface"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="?actionBarSize"
+                        android:background="?attr/colorSurfaceContainer"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:id="@+id/btnDetailBack"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="10dp"
+                            android:text="‹ 返回"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/detailTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:paddingStart="8dp"
+                            android:singleLine="true"
+                            android:text=""
+                            android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+                    </LinearLayout>
+
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/detailBody"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:lineSpacingMultiplier="1.25"
+                                android:text=""
+                                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textIsSelectable="true" />
+
+                            <LinearLayout
+                                android:id="@+id/colorPicker"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:paddingBottom="8dp"
+                                    android:text="预设颜色"
+                                    android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+
+                                <LinearLayout
+                                    android:id="@+id/colorRow"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#6750A4"
+                                        android:tag="#6750A4" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#0061A4"
+                                        android:tag="#0061A4" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#00696D"
+                                        android:tag="#00696D" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#006E1C"
+                                        android:tag="#006E1C" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#8B5000"
+                                        android:tag="#8B5000" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#BA1A1A"
+                                        android:tag="#BA1A1A" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/colorRow2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#7D5260"
+                                        android:tag="#7D5260" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#625B71"
+                                        android:tag="#625B71" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#984061"
+                                        android:tag="#984061" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#3F6833"
+                                        android:tag="#3F6833" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#6E4C00"
+                                        android:tag="#6E4C00" />
+
+                                    <View
+                                        android:layout_width="0dp"
+                                        android:layout_height="40dp"
+                                        android:layout_margin="6dp"
+                                        android:layout_weight="1"
+                                        android:background="@drawable/cl_swatch"
+                                        android:backgroundTint="#42474E"
+                                        android:tag="#42474E" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="12dp"
+                                    android:paddingBottom="6dp"
+                                    android:text="自定义十六进制"
+                                    android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+
+                                <EditText
+                                    android:id="@+id/colorHex"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="#RRGGBB"
+                                    android:inputType="text"
+                                    android:maxLines="1"
+                                    android:textColor="?attr/colorOnSurface" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnApplyColor"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp"
+                                    android:text="应用颜色"
+                                    app:cornerRadius="14dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnResetColor"
+                                    style="@style/Widget.Material3.Button.TextButton"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="恢复默认主题" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </ScrollView>
+                </LinearLayout>
+            </FrameLayout>
+        </FrameLayout>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurfaceContainer"
+            app:itemIconTint="@color/cl_nav_item"
+            app:itemTextColor="@color/cl_nav_item"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/cl_bottom_nav" />
+    </LinearLayout>
+</FrameLayout>
