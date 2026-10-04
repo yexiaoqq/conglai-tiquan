@@ -1,5 +1,7 @@
 # 聪来提权（conglai-tiquan）· S23 适配版
 
+> ⚠️ **更正公告（2026-10-04）**：`v2.0-md3` 中「KernelSU 3.2.5 (32525)」构建实测上报 **32653**，名实不符。已发布更正版 [**v2.0.1**](https://github.com/yexiaoqq/conglai-tiquan/releases/tag/v2.0.1)（真报 32525）。原委见 [《罪己诏》](docs/罪己诏.md)。
+
 > 📘 **构建 / 版本维护完整教程见 [`docs/BUILD_GUIDE.md`](docs/BUILD_GUIDE.md)**
 >
 > 🎯 **版本号（32525 / 32653…）的来源、修正配方与生效条件，只看 [`docs/KSU_VERSION_FIX.md`](docs/KSU_VERSION_FIX.md)**
